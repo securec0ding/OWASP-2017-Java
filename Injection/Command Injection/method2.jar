@@ -1,0 +1,75 @@
+package org.joychou.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+
+/**
+ * @author  JoyChou (joychou@joychou.org)
+ * @dev     RezaDuty 
+ * @date    2019.10.31
+ * @desc    Java code execute
+ * @fix     过滤造成命令执行的参数
+ */
+
+@Controller
+@RequestMapping("/rce")
+public class Rce {
+
+    @RequestMapping("/exec")
+    @ResponseBody
+    public String CommandExec(HttpServletRequest request) {
+    	
+    	
+    	String lineStr = "";
+        String ip = request.getParameter("address").toString();
+        
+	        Runtime run = Runtime.getRuntime();
+	        
+	    	if(validate(ip) && WhiteAddress(ip)) {
+		        try {
+		            Process p = run.exec("ping -n 1 "+ip);
+		            BufferedInputStream in = new BufferedInputStream(p.getInputStream());
+		            BufferedReader inBr = new BufferedReader(new InputStreamReader(in));
+		            String tmpStr;
+		
+		            while ((tmpStr = inBr.readLine()) != null) {
+		                lineStr += tmpStr + "\n";
+		                System.out.println(tmpStr);
+		            }
+		
+		            if (p.waitFor() != 0) {
+		                if (p.exitValue() == 1)
+		                    return "command exec failed";
+		            }
+		
+		            inBr.close();
+		            in.close();
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		            return "Except";
+		        }
+		} 
+	        return lineStr;
+		
+	    }
+	    public static boolean validate(final String ip) {
+	        String PATTERN = "^((0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)\\.){3}(0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)$";
+
+	        return ip.matches(PATTERN);
+	    }
+    public Boolean WhiteAddress(String ip) {
+    	String [] whitelist = {"127.0.0.1","192.168.1.1" };
+    	if(!Arrays.asList(whitelist).contains(ip)){
+    	    return true;
+    	}else {
+    		return false;
+    	}
+    }
+}
