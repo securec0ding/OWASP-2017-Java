@@ -1,19 +1,21 @@
-package com.baeldung.examples.security.sql;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class SqlInjectionSamplesApplication {
-
-	/**
-	 * Saturday - 2019 05 October
-	 * @eugenp
-	 * https://www.securecoding.ir
-	 */
-	public static void main(String[] args) {
-		SpringApplication.run(SqlInjectionSamplesApplication.class, args);
-	}
-
-}
-
+protected void Button1_Click(object sender, EventArgs e)
+        {
+        string connect = "MyConnString"
+        string query = "Select Count(*) From Users Where Username = '" + UserName.Text + "' And Password = '" + Password.Text + "'"
+        int result = 0;
+        using (var conn = new SqlConnection(connect))
+        {
+        using (var cmd = new SqlCommand(query, conn))
+        {
+        conn.Open();
+        result = (int)cmd.ExecuteScalar();
+        }
+        }
+        if (result > 0)
+        {
+        Response.Redirect("LoggedIn.aspx");
+        }
+        else
+        {
+        Literal1.Text = "Invalid credentials"
+        }
